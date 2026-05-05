@@ -45,6 +45,11 @@ const geminiLocalCLIAdapter: CLIAdapterModule = {
   formatStdoutEvent: printGeminiStreamEvent,
 };
 
+const nvidiaNimCLIAdapter: CLIAdapterModule = {
+  type: "nvidia-nim",
+  formatStdoutEvent: httpCLIAdapter.formatStdoutEvent,
+};
+
 const openclawGatewayCLIAdapter: CLIAdapterModule = {
   type: "openclaw_gateway",
   formatStdoutEvent: printOpenClawGatewayStreamEvent,
@@ -59,6 +64,7 @@ const adaptersByType = new Map<string, CLIAdapterModule>(
     piLocalCLIAdapter,
     cursorLocalCLIAdapter,
     geminiLocalCLIAdapter,
+    nvidiaNimCLIAdapter,
     openclawGatewayCLIAdapter,
     processCLIAdapter,
     httpCLIAdapter,

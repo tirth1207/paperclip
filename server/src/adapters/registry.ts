@@ -61,6 +61,19 @@ import {
   modelProfiles as geminiModelProfiles,
 } from "@paperclipai/adapter-gemini-local";
 import {
+  execute as nvidiaNimExecute,
+  getConfigSchema as getNvidiaNimConfigSchema,
+  listNvidiaNimModels,
+  listNvidiaNimSkills,
+  syncNvidiaNimSkills,
+  testEnvironment as nvidiaNimTestEnvironment,
+} from "@paperclipai/adapter-nvidia-nim/server";
+import {
+  agentConfigurationDoc as nvidiaNimAgentConfigurationDoc,
+  models as nvidiaNimModels,
+  modelProfiles as nvidiaNimModelProfiles,
+} from "@paperclipai/adapter-nvidia-nim";
+import {
   execute as openCodeExecute,
   listOpenCodeSkills,
   syncOpenCodeSkills,
@@ -278,6 +291,23 @@ const geminiLocalAdapter: ServerAdapterModule = {
   agentConfigurationDoc: geminiAgentConfigurationDoc,
 };
 
+const nvidiaNimAdapter: ServerAdapterModule = {
+  type: "nvidia-nim",
+  execute: nvidiaNimExecute,
+  testEnvironment: nvidiaNimTestEnvironment,
+  listSkills: listNvidiaNimSkills,
+  syncSkills: syncNvidiaNimSkills,
+  models: nvidiaNimModels,
+  modelProfiles: nvidiaNimModelProfiles,
+  listModels: listNvidiaNimModels,
+  supportsLocalAgentJwt: true,
+  supportsInstructionsBundle: true,
+  instructionsPathKey: "instructionsFilePath",
+  requiresMaterializedRuntimeSkills: false,
+  agentConfigurationDoc: nvidiaNimAgentConfigurationDoc,
+  getConfigSchema: getNvidiaNimConfigSchema,
+};
+
 const openclawGatewayAdapter: ServerAdapterModule = {
   type: "openclaw_gateway",
   execute: openclawGatewayExecute,
@@ -414,6 +444,7 @@ function registerBuiltInAdapters() {
     piLocalAdapter,
     cursorLocalAdapter,
     geminiLocalAdapter,
+    nvidiaNimAdapter,
     openclawGatewayAdapter,
     hermesLocalAdapter,
     processAdapter,
