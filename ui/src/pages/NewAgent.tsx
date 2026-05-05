@@ -35,6 +35,7 @@ import {
 import { DEFAULT_CURSOR_LOCAL_MODEL } from "@paperclipai/adapter-cursor-local";
 import { DEFAULT_GEMINI_LOCAL_MODEL } from "@paperclipai/adapter-gemini-local";
 import { DEFAULT_OPENCODE_LOCAL_MODEL, isValidOpenCodeModelId } from "@paperclipai/adapter-opencode-local";
+import { DEFAULT_NVIDIA_NIM_MODEL } from "@paperclipai/adapter-nvidia-nim";
 
 function createValuesForAdapterType(
   adapterType: CreateConfigValues["adapterType"],
@@ -51,6 +52,8 @@ function createValuesForAdapterType(
     nextValues.model = DEFAULT_CURSOR_LOCAL_MODEL;
   } else if (adapterType === "opencode_local") {
     nextValues.model = DEFAULT_OPENCODE_LOCAL_MODEL;
+  } else if (adapterType === "nvidia-nim") {
+    nextValues.model = DEFAULT_NVIDIA_NIM_MODEL;
   }
   return nextValues;
 }

@@ -98,6 +98,11 @@ const adapterDisplayMap: Record<string, AdapterDisplayInfo> = {
     description: "Local Cursor agent",
     icon: MousePointer2,
   },
+  nvidia_nim: {
+    label: "NVIDIA NIM",
+    description: "Run agents via NVIDIA NIM hosted API",
+    icon: Cpu,
+  },
   openclaw_gateway: {
     label: "OpenClaw Gateway",
     description: "Invoke OpenClaw via gateway protocol",

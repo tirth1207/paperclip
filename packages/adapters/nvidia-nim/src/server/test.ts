@@ -23,8 +23,46 @@ function normalizeEnv(input: unknown): Record<string, string> {
 
 function resolveBaseUrl(config: Record<string, unknown>, env: Record<string, string>): string {
   const explicit = asString(config.baseUrl, "").trim();
-  if (explicit) return explicit;
-  return (env.NVIDIA_NIM_BASE_URL ?? DEFAULT_NVIDIA_NIM_BASE_URL).trim() || DEFAULT_NVIDIA_NIM_BASE_URL;
+  if (explicit) return explicit.replace(/\/+$/, "");
+  return ((env.NVIDIA_NIM_BASE_URL ?? DEFAULT_NVIDIA_NIM_BASE_URL).trim() || DEFAULT_NVIDIA_NIM_BASE_URL).replace(/\/+$/, "");
+}
+
+function classifyProbeStatus(status: number): {
+  code: string;
+  level: AdapterEnvironmentCheck["level"];
+  message: string;
+  hint?: string | null;
+} {
+  if (status >= 200 && status < 300) {
+    return {
+      code: "nvidia_nim_endpoint_reachable",
+      level: "info",
+      message: "NVIDIA NIM endpoint responded to a connectivity probe.",
+      hint: null,
+    };
+  }
+  if (status === 401 || status === 403) {
+    return {
+      code: "nvidia_nim_endpoint_auth_required",
+      level: "info",
+      message: `NVIDIA NIM endpoint responded with HTTP ${status}, which confirms the host is reachable and expects authentication.`,
+      hint: null,
+    };
+  }
+  if (status === 404 || status === 405) {
+    return {
+      code: "nvidia_nim_endpoint_root_not_probeable",
+      level: "info",
+      message: `Endpoint probe returned HTTP ${status}. The NVIDIA host is reachable, but this root path does not serve the probe method.`,
+      hint: "This is usually fine for OpenAI-compatible APIs that only expose specific subpaths such as /chat/completions.",
+    };
+  }
+  return {
+    code: "nvidia_nim_endpoint_probe_unexpected_status",
+    level: "warn",
+    message: `Endpoint probe returned HTTP ${status}.`,
+    hint: "Verify outbound connectivity from the Paperclip server to the NVIDIA NIM API and confirm the base URL is correct.",
+  };
 }
 
 export async function testEnvironment(
@@ -62,12 +100,12 @@ export async function testEnvironment(
   }
 
   if (!apiKey) {
-    checks.push({
-      code: "nvidia_nim_api_key_missing",
-      level: "error",
-      message: "NVIDIA_NIM_API_KEY is missing.",
-      hint: "Set NVIDIA_NIM_API_KEY in adapterConfig.env or the Paperclip server environment.",
-    });
+      checks.push({
+        code: "nvidia_nim_api_key_missing",
+        level: "error",
+        message: "NVIDIA_NIM_API_KEY is missing.",
+        hint: "Set NVIDIA_NIM_API_KEY in the adapter env JSON or the Paperclip server environment.",
+      });
   } else {
     checks.push({
       code: "nvidia_nim_api_key_present",
@@ -98,14 +136,8 @@ export async function testEnvironment(
         method: "HEAD",
         signal: controller.signal,
       });
-      checks.push({
-        code: response.ok ? "nvidia_nim_endpoint_reachable" : "nvidia_nim_endpoint_probe_unexpected_status",
-        level: response.ok ? "info" : "warn",
-        message: response.ok
-          ? "NVIDIA NIM endpoint responded to a HEAD probe."
-          : `Endpoint probe returned HTTP ${response.status}.`,
-        hint: response.ok ? null : "Verify outbound connectivity from the Paperclip server to the NVIDIA NIM API.",
-      });
+      const probe = classifyProbeStatus(response.status);
+      checks.push(probe);
     } catch (error) {
       checks.push({
         code: "nvidia_nim_endpoint_probe_failed",

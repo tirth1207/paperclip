@@ -4,16 +4,16 @@ export const type = "nvidia-nim";
 export const label = "NVIDIA NIM";
 
 export const DEFAULT_NVIDIA_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
-export const DEFAULT_NVIDIA_NIM_MODEL = "meta/llama-3.1-70b-instruct";
+export const DEFAULT_NVIDIA_NIM_MODEL = "moonshotai/kimi-k2-instruct";
 
 export const models = [
-  { id: DEFAULT_NVIDIA_NIM_MODEL, label: "Llama 3.1 70B Instruct" },
-  { id: "meta/llama-3.3-70b-instruct", label: "Llama 3.3 70B Instruct" },
+  { id: DEFAULT_NVIDIA_NIM_MODEL, label: "Kimi K2 Instruct" },
+  { id: "meta/llama-4-maverick-17b-128e-instruct", label: "Llama 4 Maverick 17B 128E Instruct" },
   { id: "mistralai/mistral-small-3.2-24b-instruct", label: "Mistral Small 3.2 24B Instruct" },
   { id: "mistralai/mixtral-8x22b-instruct-v0.1", label: "Mixtral 8x22B Instruct" },
   { id: "nvidia/nemotron-3-super-120b-a12b", label: "Nemotron 3 Super 120B" },
-  { id: "deepseek-ai/deepseek-v4-pro", label: "DeepSeek V4 Pro" },
-  { id: "moonshotai/kimi-k2-thinking", label: "Kimi K2 Thinking" },
+  { id: "z-ai/glm4.7", label: "GLM 4.7" },
+  { id: "moonshotai/kimi-k2-instruct", label: "Kimi K2 Instruct" },
 ];
 
 export const modelProfiles: AdapterModelProfileDefinition[] = [
@@ -44,6 +44,7 @@ Don't use when:
 Core fields:
 - model (string, optional): NIM model id. Defaults to ${DEFAULT_NVIDIA_NIM_MODEL}
 - baseUrl (string, optional): override base URL. Defaults to ${DEFAULT_NVIDIA_NIM_BASE_URL}
+- apiKey (string, optional): direct NVIDIA NIM API key stored on adapterConfig.apiKey
 - instructionsFilePath (string, optional): absolute path to markdown instructions prepended as a system message
 - promptTemplate (string, optional): Paperclip heartbeat prompt template
 - bootstrapPromptTemplate (string, optional): extra prompt content added only on fresh runs
@@ -52,7 +53,7 @@ Core fields:
 - temperature (number, optional): forwarded as temperature
 - topP (number, optional): forwarded as top_p
 - maxToolRounds (number, optional): max Paperclip skill-call loops in one run. Defaults to 8
-- env (object, optional): environment overrides. Set NVIDIA_NIM_API_KEY here or in the host environment
+- env (object, optional): environment overrides. Set NVIDIA_NIM_API_KEY here or in the host environment when you prefer env-based configuration
 
 Operational fields:
 - timeoutSec (number, optional): request timeout in seconds

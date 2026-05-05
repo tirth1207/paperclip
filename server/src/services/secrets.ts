@@ -20,6 +20,19 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
+function parseEnvRecord(value: unknown): Record<string, unknown> | null {
+  const record = asRecord(value);
+  if (record) return record;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    return asRecord(JSON.parse(trimmed));
+  } catch {
+    return null;
+  }
+}
+
 function isSensitiveEnvKey(key: string) {
   return SENSITIVE_ENV_KEY_RE.test(key);
 }
@@ -101,7 +114,7 @@ export function secretService(db: Db) {
     envValue: unknown,
     opts?: NormalizeEnvOptions,
   ): Promise<AgentEnvConfig> {
-    const record = asRecord(envValue);
+    const record = parseEnvRecord(envValue);
     if (!record) throw unprocessable(`${opts?.fieldPath ?? "env"} must be an object`);
 
     const normalized: AgentEnvConfig = {};
@@ -321,7 +334,7 @@ export function secretService(db: Db) {
     },
 
     resolveEnvBindings: async (companyId: string, envValue: unknown): Promise<{ env: Record<string, string>; secretKeys: Set<string> }> => {
-      const record = asRecord(envValue);
+      const record = parseEnvRecord(envValue);
       if (!record) return { env: {} as Record<string, string>, secretKeys: new Set<string>() };
       const resolved: Record<string, string> = {};
       const secretKeys = new Set<string>();
@@ -351,7 +364,7 @@ export function secretService(db: Db) {
       if (!Object.prototype.hasOwnProperty.call(adapterConfig, "env")) {
         return { config: resolved, secretKeys };
       }
-      const record = asRecord(adapterConfig.env);
+      const record = parseEnvRecord(adapterConfig.env);
       if (!record) {
         resolved.env = {};
         return { config: resolved, secretKeys };

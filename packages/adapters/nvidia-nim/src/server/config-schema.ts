@@ -25,6 +25,12 @@ export function getConfigSchema(): AdapterConfigSchema {
         hint: "Optional override for the NVIDIA NIM OpenAI-compatible API base URL.",
       },
       {
+        key: "apiKey",
+        label: "API key",
+        type: "text",
+        hint: "Optional direct NVIDIA NIM API key. If set, runs use this before adapter env NVIDIA_NIM_API_KEY.",
+      },
+      {
         key: "instructionsFilePath",
         label: "Instructions file",
         type: "text",

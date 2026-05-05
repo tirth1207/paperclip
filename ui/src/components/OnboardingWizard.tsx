@@ -115,6 +115,7 @@ export function OnboardingWizard() {
   const [command, setCommand] = useState("");
   const [args, setArgs] = useState("");
   const [url, setUrl] = useState("");
+  const [nvidiaNimApiKey, setNvidiaNimApiKey] = useState("");
   const [adapterEnvResult, setAdapterEnvResult] =
     useState<AdapterEnvironmentTestResult | null>(null);
   const [adapterEnvError, setAdapterEnvError] = useState<string | null>(null);
@@ -236,7 +237,7 @@ export function OnboardingWizard() {
     if (step !== 2) return;
     setAdapterEnvResult(null);
     setAdapterEnvError(null);
-  }, [step, adapterType, model, command, args, url]);
+  }, [step, adapterType, model, command, args, url, nvidiaNimApiKey]);
 
   const selectedModel = (adapterModels ?? []).find((m) => m.id === model);
   const hasAnthropicApiKeyOverrideCheck =
@@ -296,6 +297,7 @@ export function OnboardingWizard() {
     setCommand("");
     setArgs("");
     setUrl("");
+    setNvidiaNimApiKey("");
     setAdapterEnvResult(null);
     setAdapterEnvError(null);
     setAdapterEnvLoading(false);
@@ -341,6 +343,9 @@ export function OnboardingWizard() {
           ? DEFAULT_CODEX_LOCAL_BYPASS_APPROVALS_AND_SANDBOX
           : defaultCreateValues.dangerouslyBypassSandbox
     });
+    if (adapterType === "nvidia-nim" && nvidiaNimApiKey.trim()) {
+      config.apiKey = nvidiaNimApiKey.trim();
+    }
     if (adapterType === "claude_local" && forceUnsetAnthropicApiKey) {
       const env =
         typeof config.env === "object" &&
@@ -939,6 +944,19 @@ export function OnboardingWizard() {
                           </PopoverContent>
                         </Popover>
                       </div>
+                      {adapterType === "nvidia-nim" && (
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">
+                            API key
+                          </label>
+                          <input
+                            className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
+                            placeholder="nvapi-..."
+                            value={nvidiaNimApiKey}
+                            onChange={(e) => setNvidiaNimApiKey(e.target.value)}
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
 
